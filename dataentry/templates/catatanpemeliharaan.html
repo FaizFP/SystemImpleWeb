@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>System Implementation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #5e6350;
+      color: white;
+      height: 100vh;
+    }
+
+    .page-title {
+      background-color: #5e6350;
+      color: white;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 60px);
+      flex-direction: row;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #2e3527;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+
+    .menu-item {
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background-color: #3e4537;
+    }
+
+    .dropdown.active .submenu {
+      display: block;
+    }
+
+    .submenu {
+      background-color: #1f221b;
+      display: none;
+      padding-left: 20px;
+    }
+
+    .submenu a {
+      display: block;
+      padding: 8px 0;
+      text-decoration: none;
+      color: white;
+      font-size: 14px;
+    }
+
+    .submenu a:hover {
+      text-decoration: underline;
+    }
+
+    .arrow {
+      display: inline-block;
+      margin-left: 10px;
+      width: 0;
+      height: 0;
+      vertical-align: middle;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 5px solid white;
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown.active .arrow {
+      transform: rotate(90deg);
+    }
+
+    .main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 20px;
+    }
+
+    .profile img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+
+    .tabs {
+      background-color: #aaa;
+      padding: 10px;
+      display: flex;
+      gap: 20px;
+      border-radius: 5px;
+      margin: 10px auto 20px;
+      width: fit-content;
+      user-select: none;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      background-color: #ccc;
+      border-radius: 5px;
+      color: black;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .tab:hover {
+      background-color: #bbb;
+    }
+
+    .tab.active {
+      background-color: #444;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+    }
+
+    .center-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-container {
+      background-color: #2e3527;
+      padding: 40px;
+      width: 500px;
+      height: 450px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 0;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 18px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background-color: #d0c7c7;
+      color: #333;
+      font-size: 14px;
+    }
+
+    select:invalid {
+      color: gray;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #ccc;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #bbb;
+    }
+
+    /* ========= RESPONSIVE ========= */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .menu-item {
+        width: 100%;
+        text-align: center;
+      }
+
+      .main {
+        padding: 10px;
+      }
+
+      .tabs {
+        justify-content: center;
+        margin: 10px auto;
+      }
+
+      .form-container {
+        width: 90%;
+        height: auto;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .profile {
+        padding-right: 0;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Judul -->
+  <div class="page-title">
+    System Implementation
+  </div>
+
+  <!-- Container Utama -->
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="menu-item">Dashboard</div>
+      <div class="menu-item dropdown" onclick="toggleDropdown(this)">
+        Project
+        <span class="arrow"></span>
+        <div class="submenu">
+          <a href="#">Project</a>
+        </div>
+      </div>
+      <div class="menu-item">Kinerja Perangkat Lunak</div>
+      <div class="menu-item">DOWNLOAD</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Header -->
+      <div class="header">
+        <div></div>
+        <div class="profile">
+          <span>Tsana</span>
+          <img src="https://via.placeholder.com/30" alt="Profile" />
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs" id="tabs">
+        <div class="tab">Project</div>
+        <div class="tab">Aktivitas Perangkat Lunak</div>
+        <div class="tab active">Catatan Pemeliharaan</div>
+        <div class="tab">Data Lingkungan</div>
+        <div class="tab">Transaksi</div>
+      </div>
+
+      <!-- Form Tengah -->
+      <div class="center-wrapper">
+        <div class="form-container">
+          <h2>Catatan Pemeliharaan</h2>
+          <form>
+            <label for="project">Project</label>
+            <input type="text" id="project" name="project" />
+
+            <label for="suggest">Suggest</label>
+            <input type="text" id="suggest" name="suggest" />
+
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+              <option value="" disabled selected hidden>Pick an option</option>
+              <option value="hardware">Hardware</option>
+              <option value="software">Software</option>
+              <option value="network">Network</option>
+            </select>
+
+            <label for="status">Status</label>
+            <select id="status" name="status" required>
+              <option value="" disabled selected hidden>Pick an option</option>
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+
+            <button type="submit">SAVE</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleDropdown(element) {
+      element.classList.toggle("active");
+    }
+
+    // Script untuk ganti tab aktif ketika diklik
+    const tabs = document.querySelectorAll(".tab");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        // Hapus class active dari semua tab
+        tabs.forEach((t) => t.classList.remove("active"));
+        // Tambah class active ke tab yang diklik
+        tab.classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>
